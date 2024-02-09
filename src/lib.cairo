@@ -28,7 +28,7 @@ trait IERC404<TContractState> {
 #[starknet::contract]
 mod ERC404 {
     use core::num::traits::zero::Zero;
-use starknet::get_caller_address;
+    use starknet::get_caller_address;
     use starknet::ContractAddress;
 
     #[event]
@@ -131,15 +131,12 @@ use starknet::get_caller_address;
             self.assert_only_owner();
             self.ERC404_whitelist.write(target, state);
         }
-
-
     }
 
 
     // INTERNAL FUNCTIONS
     #[generate_trait]
     impl Internal of InternalTrait {
-
         // Assert contract owner is calling
         fn assert_only_owner(self: @ContractState) {
             let owner = self.ERC404_owner.read();
