@@ -8,20 +8,26 @@ trait IERC404<TContractState> {
     fn transfer(ref self: TContractState, recipient: ContractAddress, amount: u256) -> bool;
     fn allowance(self: @TContractState, owner: ContractAddress, spender: ContractAddress) -> u256;
     fn approve(ref self: TContractState, spender: ContractAddress, amount: u256) -> bool;
-    fn transfer_from(ref self: TContractState, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
+    fn transfer_from(
+        ref self: TContractState, sender: ContractAddress, recipient: ContractAddress, amount: u256
+    ) -> bool;
 
     // Non-Fungible Token Functions (ERC721-like)
     fn owner_of(self: @TContractState, token_id: u256) -> ContractAddress;
     fn approve_nft(ref self: TContractState, to: ContractAddress, token_id: u256);
-    fn transfer_nft(ref self: TContractState, from: ContractAddress, to: ContractAddress, token_id: u256);
+    fn transfer_nft(
+        ref self: TContractState, from: ContractAddress, to: ContractAddress, token_id: u256
+    );
     fn token_uri(self: @TContractState, token_id: u256) -> felt252;
 
-    fn set_whitelist(ref self: TContractState, target: ContractAddress, state: bool);
 
+    // Admin Functions
+    fn set_whitelist(ref self: TContractState, target: ContractAddress, state: bool);
 }
 
 #[starknet::contract]
 mod ERC404 {
+    use core::num::traits::zero::Zero;
     use starknet::get_caller_address;
     use starknet::ContractAddress;
 
@@ -60,6 +66,8 @@ mod ERC404 {
         // /// @dev Total supply in fractionalized representation
         // uint256 public immutable totalSupply;
         ERC404_total_supply: u256,
+        // /// @dev Contract Owner
+        ERC404_owner: ContractAddress,
         // /// @dev Current mint counter, monotonically increasing to ensure accurate ownership
         // uint256 public minted;
         ERC404_minted: u256,
@@ -111,6 +119,7 @@ mod ERC404 {
         self.ERC404_decimals.write(_decimals);
         // TODO: Implement POW for 10**_decimals
         self.ERC404_total_supply.write(_totalNativeSupply * (10));
+        self.ERC404_owner.write(_owner);
     }
 
     #[abi(embed_v0)]
@@ -119,8 +128,21 @@ mod ERC404 {
 
         // manage whitelist addresses
         fn set_whitelist(ref self: ContractState, target: ContractAddress, state: bool) {
+            self.assert_only_owner();
             self.ERC404_whitelist.write(target, state);
         }
+    }
 
+
+    // INTERNAL FUNCTIONS
+    #[generate_trait]
+    impl Internal of InternalTrait {
+        // Assert contract owner is calling
+        fn assert_only_owner(self: @ContractState) {
+            let owner = self.ERC404_owner.read();
+            let caller = get_caller_address();
+            assert(caller.is_non_zero(), 'Caller is the zero address');
+            assert(caller == owner, 'Caller is not the owner');
+        }
     }
 }
