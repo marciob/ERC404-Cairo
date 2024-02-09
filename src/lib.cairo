@@ -2,7 +2,7 @@ use starknet::ContractAddress;
 
 #[starknet::interface]
 trait IERC404<TContractState> {
-    Fungible Token Functions (ERC20-like)
+    // Fungible Token Functions (ERC20-like)
     fn total_supply(self: @TContractState) -> u256;
     fn balance_of(self: @TContractState, account: ContractAddress) -> u256;
     fn transfer(ref self: TContractState, recipient: ContractAddress, amount: u256) -> bool;
@@ -20,6 +20,8 @@ trait IERC404<TContractState> {
     );
     fn token_uri(self: @TContractState, token_id: u256) -> felt252;
 
+
+    // Admin Functions
     fn set_whitelist(ref self: TContractState, target: ContractAddress, state: bool);
 }
 
