@@ -34,20 +34,70 @@ mod ERC404 {
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
-        Transfer: Transfer,
-        Approval: Approval,
+        TransferERC20: TransferERC20,
+        TransferERC721: TransferERC721,
+        ApprovalERC20: ApprovalERC20,
+        ApprovalERC721: ApprovalERC721,
+        Mint: Mint,
+        Burn: Burn,
+        WhitelistChanged: WhitelistChanged,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct Transfer {}
+    struct TransferERC20 {
+        #[key]
+        from: ContractAddress,
+        #[key]
+        to: ContractAddress,
+        amount: u256,
+    }
 
     #[derive(Drop, starknet::Event)]
-    struct Approval {
+    struct TransferERC721 {
+        #[key]
+        from: ContractAddress,
+        #[key]
+        to: ContractAddress,
+        token_id: u256,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct ApprovalERC20 {
         #[key]
         owner: ContractAddress,
         #[key]
         spender: ContractAddress,
-        value: u256
+        amount: u256,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct ApprovalERC721 {
+        #[key]
+        owner: ContractAddress,
+        #[key]
+        approved: ContractAddress,
+        token_id: u256,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct Mint {
+        #[key]
+        to: ContractAddress,
+        token_id: u256,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct Burn {
+        #[key]
+        from: ContractAddress,
+        token_id: u256,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct WhitelistChanged {
+        #[key]
+        target: ContractAddress,
+        state: bool,
     }
 
     #[storage]
@@ -130,6 +180,7 @@ mod ERC404 {
         fn set_whitelist(ref self: ContractState, target: ContractAddress, state: bool) {
             self.assert_only_owner();
             self.ERC404_whitelist.write(target, state);
+            self.emit(WhitelistChanged { target: target, state: state });
         }
     }
 
