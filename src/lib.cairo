@@ -1,7 +1,21 @@
+use starknet::ContractAddress;
 
 #[starknet::interface]
 trait IERC404<TContractState> {
-    // Implement functions
+    // Fungible Token Functions (ERC20-like)
+    fn total_supply(self: @TContractState) -> u256;
+    fn balance_of(self: @TContractState, account: ContractAddress) -> u256;
+    fn transfer(ref self: TContractState, recipient: ContractAddress, amount: u256) -> bool;
+    fn allowance(self: @TContractState, owner: ContractAddress, spender: ContractAddress) -> u256;
+    fn approve(ref self: TContractState, spender: ContractAddress, amount: u256) -> bool;
+    fn transfer_from(ref self: TContractState, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
+
+    // Non-Fungible Token Functions (ERC721-like)
+    fn owner_of(self: @TContractState, token_id: u256) -> ContractAddress;
+    fn approve_nft(ref self: TContractState, to: ContractAddress, token_id: u256);
+    fn transfer_nft(ref self: TContractState, from: ContractAddress, to: ContractAddress, token_id: u256);
+    fn token_uri(self: @TContractState, token_id: u256) -> felt252;
+    
 }
 
 #[starknet::contract]
@@ -118,5 +132,3 @@ mod ERC404 {
         // Implement functions
     }
 }
-
-
