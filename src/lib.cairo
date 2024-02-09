@@ -1,7 +1,11 @@
+use starknet::ContractAddress;
 
 #[starknet::interface]
 trait IERC404<TContractState> {
     // Implement functions
+
+
+    fn set_whitelist(ref self: TContractState, target: ContractAddress, state: bool);
 }
 
 #[starknet::contract]
@@ -17,9 +21,7 @@ mod ERC404 {
     }
 
     #[derive(Drop, starknet::Event)]
-    struct Transfer {
-
-    }
+    struct Transfer {}
 
     #[derive(Drop, starknet::Event)]
     struct Approval {
@@ -32,52 +34,39 @@ mod ERC404 {
 
     #[storage]
     struct Storage {
-
         // Implement storage
         // Metadata
         // /// @dev Token name
         // string public name;
         ERC404_name: felt252,
-
-
         // /// @dev Token symbol
         // string public symbol;
         ERC404_symbol: felt252,
-
         // /// @dev Decimals for fractional representation
         // uint8 public immutable decimals;
         ERC404_decimals: u8,
-
-
         // /// @dev Total supply in fractionalized representation
         // uint256 public immutable totalSupply;
         ERC404_total_supply: u256,
-
         // /// @dev Current mint counter, monotonically increasing to ensure accurate ownership
         // uint256 public minted;
         ERC404_minted: u256,
-
         // // Mappings
         // /// @dev Balance of user in fractional representation
         // mapping(address => uint256) public balanceOf;
         ERC404_balances: LegacyMap<ContractAddress, u256>,
-
         // /// @dev Allowance of user in fractional representation
         // mapping(address => mapping(address => uint256)) public allowance;
         ERC404_allowances: LegacyMap<(ContractAddress, ContractAddress), u256>,
-
         // /// @dev Approval in native representaion
         // mapping(uint256 => address) public getApproved;
         ERC404_get_approved: LegacyMap<u256, ContractAddress>,
-
         // /// @dev Approval for all in native representation
         // mapping(address => mapping(address => bool)) public isApprovedForAll;
         ERC404_is_approved_for_all: LegacyMap<(ContractAddress, ContractAddress), bool>,
-
         // /// @dev Owner of id in native representation
         // mapping(uint256 => address) internal _ownerOf;
         ERC404_owner_of: LegacyMap<u256, ContractAddress>,
-
         // /// @dev Array of owned ids in native representation
         // mapping(address => uint256[]) internal _owned;
         //TODO: Check the best way to implement this in Cairo
@@ -86,7 +75,6 @@ mod ERC404 {
         // /// @dev Tracks indices for the _owned mapping
         // mapping(uint256 => uint256) internal _ownedIndex;
         ERC404_owned_index: LegacyMap<u256, u256>,
-
         // /// @dev Addresses whitelisted from minting / burning for gas savings (pairs, routers, etc)
         // mapping(address => bool) public whitelist;
         ERC404_whitelist: LegacyMap<ContractAddress, bool>,
@@ -116,7 +104,11 @@ mod ERC404 {
     #[abi(embed_v0)]
     impl ERC404Impl of super::IERC404<ContractState> {
         // Implement functions
+
+
+        // manage whitelist addresses
+        fn set_whitelist(ref self: ContractState, target: ContractAddress, state: bool) {
+            self.ERC404_whitelist.write(target, state);
+        }
     }
 }
-
-
