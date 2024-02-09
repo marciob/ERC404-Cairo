@@ -2,10 +2,22 @@ use starknet::ContractAddress;
 
 #[starknet::interface]
 trait IERC404<TContractState> {
-    // Implement functions
+    // Fungible Token Functions (ERC20-like)
+    fn total_supply(self: @TContractState) -> u256;
+    fn balance_of(self: @TContractState, account: ContractAddress) -> u256;
+    fn transfer(ref self: TContractState, recipient: ContractAddress, amount: u256) -> bool;
+    fn allowance(self: @TContractState, owner: ContractAddress, spender: ContractAddress) -> u256;
+    fn approve(ref self: TContractState, spender: ContractAddress, amount: u256) -> bool;
+    fn transfer_from(ref self: TContractState, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
 
+    // Non-Fungible Token Functions (ERC721-like)
+    fn owner_of(self: @TContractState, token_id: u256) -> ContractAddress;
+    fn approve_nft(ref self: TContractState, to: ContractAddress, token_id: u256);
+    fn transfer_nft(ref self: TContractState, from: ContractAddress, to: ContractAddress, token_id: u256);
+    fn token_uri(self: @TContractState, token_id: u256) -> felt252;
 
     fn set_whitelist(ref self: TContractState, target: ContractAddress, state: bool);
+
 }
 
 #[starknet::contract]
@@ -105,10 +117,10 @@ mod ERC404 {
     impl ERC404Impl of super::IERC404<ContractState> {
         // Implement functions
 
-
         // manage whitelist addresses
         fn set_whitelist(ref self: ContractState, target: ContractAddress, state: bool) {
             self.ERC404_whitelist.write(target, state);
         }
+
     }
 }
