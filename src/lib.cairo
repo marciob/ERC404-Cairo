@@ -4,7 +4,7 @@ use starknet::ContractAddress;
 trait IERC404<TContractState> {
     // Implement functions
 
-    
+
     fn set_whitelist(ref self: TContractState, target: ContractAddress, state: bool);
 }
 
@@ -105,6 +105,8 @@ mod ERC404 {
     impl ERC404Impl of super::IERC404<ContractState> {
         // Implement functions
 
+
+        // manage whitelist addresses
         fn set_whitelist(ref self: ContractState, target: ContractAddress, state: bool) {
             self.ERC404_whitelist.write(target, state);
         }
