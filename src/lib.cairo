@@ -100,6 +100,9 @@ mod ERC404 {
         // /// @dev Addresses whitelisted from minting / burning for gas savings (pairs, routers, etc)
         // mapping(address => bool) public whitelist;
         ERC404_whitelist: LegacyMap<ContractAddress, bool>,
+        // /// @dev Token URIs
+        // mapping(uint256 => string) public tokenURIs;
+        ERC404_token_uris: LegacyMap<u256, felt252>,
     }
     // Implement constructor
     #[constructor]
@@ -138,6 +141,15 @@ mod ERC404 {
             self.ERC404_symbol.read()
         }
 
+        // Function to retrieve the token URI
+        fn token_uri(self: @ContractState, token_id: u256) -> felt252 {
+            // Check if the token exists
+            assert(self.ERC404_owner_of.read(token_id).is_non_zero(), 'Token does not exist');
+
+            // Return the token URI
+            self.ERC404_token_uris.read(token_id)
+        }
+
         // manage whitelist addresses
         fn set_whitelist(ref self: ContractState, target: ContractAddress, state: bool) {
             self.assert_only_owner();
@@ -155,6 +167,16 @@ mod ERC404 {
             let caller = get_caller_address();
             assert(caller.is_non_zero(), 'Caller is the zero address');
             assert(caller == owner, 'Caller is not the owner');
+        }
+
+        /// Sets the `token_uri` of `token_id`.
+        /// Requirements:
+        /// - `token_id` exists.
+        fn _set_token_uri(
+            ref self: ContractState, token_id: u256, token_uri: felt252
+        ) {
+            assert(self.ERC404_owner_of.read(token_id).is_non_zero(), 'Token does not exist');
+            self.ERC404_token_uris.write(token_id, token_uri);
         }
     }
 }
