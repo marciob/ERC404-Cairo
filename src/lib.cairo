@@ -20,6 +20,8 @@ trait IERC404<TContractState> {
     );
     fn token_uri(self: @TContractState, token_id: u256) -> felt252;
 
+    fn name(self: @TContractState) -> felt252;
+    fn symbol(self: @TContractState) -> felt252;
 
     // Admin Functions
     fn set_whitelist(ref self: TContractState, target: ContractAddress, state: bool);
@@ -125,6 +127,16 @@ mod ERC404 {
     #[abi(embed_v0)]
     impl ERC404Impl of super::IERC404<ContractState> {
         // Implement functions
+
+        // Getter function for token name
+        fn name(self: @ContractState) -> felt252 {
+            self.ERC404_name.read()
+        }
+
+        // Getter function for token symbol
+        fn symbol(self: @ContractState) -> felt252 {
+            self.ERC404_symbol.read()
+        }
 
         // manage whitelist addresses
         fn set_whitelist(ref self: ContractState, target: ContractAddress, state: bool) {
