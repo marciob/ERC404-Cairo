@@ -150,6 +150,13 @@ mod ERC404 {
             self.ERC404_token_uris.read(token_id)
         }
 
+        // Function to find the owner of a given token
+        fn owner_of(self: @ContractState, token_id: u256) -> ContractAddress {
+            let owner = self.ERC404_owner_of.read(token_id);
+            assert(owner.is_non_zero(), 'Token does not exist');
+            owner
+        }
+
         // manage whitelist addresses
         fn set_whitelist(ref self: ContractState, target: ContractAddress, state: bool) {
             self.assert_only_owner();
